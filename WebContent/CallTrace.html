@@ -1,0 +1,319 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="css/dials.tools.css"></head>
+    <title>Call Tracer</title>
+  </head>
+  <body>
+    <div class="container"></div>
+    <div class="search row">
+      <div class="col-sm-12">
+        <div class="input-group">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="QPrev" name="QS">Prev</button>
+          </span>
+          <input type="text" id="searchQ" class="form-control">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="QNext" name="QS">Next</button>
+          </span>
+        </div><!-- /input-group -->
+      </div><!-- /.col-lg-6 -->
+    </div>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/lodash.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/xmlt.js"></script>
+
+
+    <script type="text/xmlt" id="Call">
+      <div class="row">
+          <div class="col-xs-12">
+
+          <table class="table table-bordered">
+              {% _.forEach($attrs, function(name, text) { %}
+              <tr>
+                  <td>{{- text }}</td>
+                  <th>{{- name }}</th>
+              </tr>
+              {% }); %}
+          </table>
+
+          </div>
+      </div>
+
+      <div class="row">
+          <div class="col-xs-12"> 
+            {{ applyTemplate($nodes("Workflow"), "Workflow") }}              
+          </div>
+      </div>
+    </script>
+
+    <script type="text/xmlt" id="Workflow" alias="wf">
+      <div class="panel-group" id="{{- $uid }}">
+          <h2>{{- $attrs.nm }}<i class="glyphicon glyphicon-cog"></i></h2>
+	  	  {{ applyTemplate($nodes("InputParameters,> OutputParameters")) }}
+          {{ applyTemplate($nodes("ST"), "ST", {'$accordion': $uid}) }}
+      </div>
+    </script>
+
+    <script type="text/xmlt" id="ST">
+      {% var toWorkflow = $nodes("ToWorkflow").value(); %}
+      <div class="panel panel-default st">
+          <div class="panel-heading">
+              <h4 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#{{- $accordion }}" href="#{{- $uid }}">
+                    <div class="row">
+                      <div class="col-sm-6 name">{{- $attrs.nm }}&nbsp;{{toWorkflow.length? '(' + toWorkflow[0].$attrs.calledWorkflow + ')': ''}}</div>
+                      <div class="col-sm-6">
+                        <div class="pull-right">
+                          <i class="glyphicon glyphicon-screenshot"></i>{{- $attrs.cid }}
+                          <i class="glyphicon glyphicon-time"></i>{{- $attrs.et }}
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+              </h4>
+          </div>
+          <div class="panel-collapse collapse" id="{{- $uid }}">
+              <div class="panel-body">
+                  {{ applyTemplate($nodes(), undefined, {'$accordion': $accordion, '$st': $uid}) }}
+              </div>
+          </div>
+      </div>
+    </script>
+
+    <script type="text/xmlt" id="Update">
+      {% var isSuccess = ($attrs.expressionResult != 'false'); %}
+      <div class="type update">
+          <div class="row {% if(!isSuccess) { %} text-danger bg-danger{% } %}">
+              <div class="col-sm-4">
+                  {% if( $attrs.expression || $nodes().length ) { %}
+                    <a data-toggle="collapse" class="{% if(!isSuccess) { %} text-danger{% } %}" href="#{{- $uid }}"> 
+                        <i class="glyphicon glyphicon-floppy-{% print(isSuccess? 'save' : 'remove') %}"></i>&#160;{{- $attrs.nm }}
+                    </a>
+                  {% } else { %}
+                    <i class="glyphicon glyphicon-floppy-{% print(isSuccess? 'save' : 'remove') %}"></i>&#160;{{- $attrs.nm }}
+                  {% } %}
+              </div>
+              <div class="col-sm-4">{{- $attrs.value }}</div>
+              <div class="col-sm-4">{{- $attrs.updateResult }}</div>
+          </div>
+          {% if( $attrs.expression || $nodes().length ) { %}
+            <div class="collapse in {% if(!isSuccess) { %} bg-danger{% } %}" id="{{- $uid }}">
+
+                <table class="table table-bordered">
+                    <tr style="display:none;"><td></td><td></td></tr>
+                    {% if( $attrs.expression  ) { %}
+                      <tr>
+                          <th colspan="2">Expression</th>
+                      </tr>
+                      <tr>
+                          <td>{{- $attrs.expression }}</td>
+                          <td>{{- $attrs.expressionResult || '' }}</td>
+                      </tr>
+                    {% } %}
+
+                    {{ applyTemplate($nodes(), "nodeToText") }}
+                </table>
+
+            </div>
+          {% } %}
+      </div>
+    </script>
+
+    <script type="text/xmlt" id="nodeToText">
+      {% if( $text() ) { %}
+        <tr title="Child Node"><th colspan="2">{{- $name }}<i class="glyphicon glyphicon-leaf"></i></th></tr>
+        <tr><td colspan="2">{{- $text() }}</td></tr>
+      {% } %}
+    </script>
+
+    <script type="text/xmlt" id="Next">
+      <div class="type next">
+          <div class="row">
+              <div class="col-sm-12">
+                  <a data-toggle="collapse" href="#{{- $uid }}"> 
+                      <i class="glyphicon glyphicon-share"></i>Next
+                  </a>
+              </div>
+          </div>
+          <div class="collapse in" style="padding-left: 20px;" id="{{- $uid }}">
+
+            {{ applyTemplate($nodes("Case"), "Case", {'$accordion': $accordion, '$st': $st}) }}
+
+          </div>
+      </div>
+
+
+    </script>
+
+    <script type="text/xmlt" id="Case">
+      {% var isSuccess = $attrs.result == 'true' || $attrs.isDefault == 'true' %}
+      <div class="type next case" class="Case">
+          <div class="row">
+              <div class="col-sm-12">
+                  <a data-toggle="collapse" href="#{{- $uid }}" class="text-{% print(isSuccess?'success': 'info') %}"> 
+                      <i class="glyphicon glyphicon-{% print(isSuccess?'ok': 'info') %}-sign"></i>{{- $attrs.expression || '$ Default Case $' }}
+                  </a>
+              </div>
+          </div>
+          <div class="row collapse in" id="{{- $uid }}">
+            <div class="col-sm-offset-1 col-sm-11">
+              {{ applyTemplate($nodes(), undefined, {'$accordion': $accordion, '$st': $st}) }}
+          </div>
+        </div>
+      </div>
+
+    </script>
+
+    <script type="text/xmlt" id="ValueNode" alias="SessionUsedForExpression,input,output,InputParameters,OutputParameters,OSDM_Response">
+      <div class="type value-node" title="{{- $name }}">
+        <div class="row">
+          <div class="col-sm-12"><strong>{{- $name }}</strong></div>
+        </div>
+        <div class="row">
+          <div class="col-sm-offset-1 col-sm-11">
+            {{ applyTemplate(makePairs($text()), "KeyValue") }}
+          </div>
+        </div>
+      </div>
+    </script>
+
+    <script type="text/xmlt" id="UI">
+      <div class="type value-node" title="UI">
+        <div class="row">
+          <div class="col-sm-12">
+            <a data-toggle="collapse" href="#{{- $uid }}">
+              <i class="glyphicon glyphicon-user"></i><strong>{{- $name }}</strong>
+            </a>
+          </div>
+        </div>
+        <div class="row collapse in" id="{{- $uid }}">
+          <div class="col-sm-offset-1 col-sm-11">
+            {{ applyTemplate($nodes()) }}
+          </div>
+        </div>
+      </div>
+    </script>
+
+    <script type="text/xmlt" id="ToState">
+      <div class="row text-primary" title="To State">
+        <div class="col-sm-12">
+          <a href="#{{- next($st) }}" data-toggle="collapse" data-parent="#{{$accordion}}">
+            <i class="glyphicon glyphicon-share-alt to-state"></i>{{- $attrs.toState }}
+          </a>
+        </div>
+      </div>
+    </script>
+
+    <script type="text/xmlt" id="DataAction">
+      {% var isSuccess = $attrs.result == 'true' || $attrs.isDefault == 'true' %}
+      <div class="type next case" title="Data Action">
+          <div class="row">
+            <a data-toggle="collapse" href="#{{- $uid }}"> 
+              <div class="col-sm-6"><i class="glyphicon glyphicon-pencil"></i>{{- $attrs.action }}</div>
+              <div class="col-sm-6">
+                <div class="pull-right">
+                  <i class="glyphicon glyphicon-align-justify"></i>{{- $attrs.source }}
+                </div>
+              </div>
+            </a>              
+          </div>
+          <div class="row collapse in" id="{{- $uid }}">
+            <div class="col-sm-offset-1 col-sm-11">
+              {{ applyTemplate($nodes("SessionUsedForExpression, > input, > output"), "ValueNode") }}
+          </div>
+        </div>
+      </div>
+
+    </script>
+
+    <script type="text/xmlt" id="ToWorkflow">
+      <div class="row text-primary" title="To Work Flow">
+        <div class="col-sm-12">
+          <i class="glyphicon glyphicon-share-alt"></i>{{- $attrs.calledWorkflow }}<i class="glyphicon glyphicon glyphicon-cog"></i>
+        </div>
+      </div>
+    </script>
+
+    <script type="text/xmlt" id="S">
+    </script>
+
+    <script type="text/xmlt" id="KeyValue">
+      <div class="row">
+        <div class="col-sm-6">{{- key }}</div>
+        <div class="col-sm-6">{{- value }}</div>
+      </div>
+    </script>
+
+    <script type="text/javascript">
+      var scrollPoint = $('html, body');
+      function gotoTop(top) { scrollPoint.stop().animate({scrollTop: top}, 700); }
+
+      function scrollToST(event) {
+        if(this === event.target) {
+          var collapse = $( this );
+          gotoTop( collapse.offset().top - 45);
+        }
+        //$('.collapse', this).collapse('show');
+      };
+      
+      $(function() {
+        if( location.hash ) {
+          $.get('/DrivrDiagnostics/api/tracelog/retrieve/' + location.hash.substr(1)).done(function(xml) {
+        	$('.container').append( parse('Call', $('Call', xml)[0]) );
+        	
+        	var segments = $('.collapse[id^="ST"]'),
+        		searchQ = $('#searchQ'),
+        		resultIndex = -1,
+        		searchResults;
+        	
+        	var searchThrough = segments.find('> > >:not(.st) *:not(.glyphicon,.row,:empty)');
+        	
+        	_.each(segments, function(stNode) { $(stNode).has('.collapse[id^="ST"]').css("background-color", "#CCC"); });
+        	
+        	function getSegment(direction) {
+        	  if(direction && segmentIndex > -2 && segmentIndex < segmentsMax ) {
+        	  	segmentIndex += (direction == 'Next'?  1 : -1);
+        	  }
+        	  return segments[segmentIndex];
+        	};
+        	
+        	searchQ.on('change', function() {
+        	  var queryStr = searchQ.val().toLowerCase();
+        	  searchThrough.removeClass('search-focus');
+        	  resultIndex = -1;
+        	  if(queryStr && queryStr.length) {
+          	    searchThrough.each(function() {
+          		  if( _.any(this.childNodes, function(node) {
+              	    return node.nodeType == 3 && node.textContent.toLowerCase().indexOf(queryStr) > -1;
+              	  }) ) { $(this).addClass('search-focus'); }
+          	    });
+        	  }
+        	  searchResults = $('.search-focus');
+        	}).triggerHandler('change');
+        	
+        	
+        	$('button[name="QS"]').click(function() {
+        	   var direction = this.id.substr(1); 
+        	   resultIndex += direction == 'Next'? 1: -1;
+        	   var toFocus = searchResults.eq(resultIndex),
+        	   	   segmentsToFocus = segments.has(toFocus);
+        	   
+        	   segments.not(segmentsToFocus).filter('.in').collapse('hide');
+        	   segmentsToFocus.not('.in').collapse('show');
+        	   gotoTop(toFocus.offset().top - 5);
+        	});
+
+    	    $('[id^="ST"]').on('shown.bs.collapse', scrollToST);
+	      });
+        }
+      });
+    </script>
+  </body>
+</html>

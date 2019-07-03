@@ -1,0 +1,119 @@
+.stick-table .sticky-head {
+  padding-right: 17px;
+}
+
+.stick-table .sticky-head table {
+  margin-bottom: 0px;
+}
+
+.stick-table .header-cell {
+  -ms-user-select: none;
+  cursor: pointer;
+}
+
+.stick-table .sticky-body {
+  height: 175px;
+  position: relative;
+  overflow-y: scroll;
+}
+
+.type {
+  margin: 10px 0;
+}
+
+.type .update {}
+
+.bg-danger .table-bordered, .bg-danger .table-bordered th, .bg-danger .table-bordered td {
+  border-color: #A94442;
+}
+
+.glyphicon {
+  margin: 0 5px;
+}
+
+.callTraceFrame {
+  border: 0 none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 1000px;
+}
+
+.table-fixed-columns tr {
+  white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  white-space: pre-wrap;       /* css-3 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  word-break: break-all;
+  white-space: normal;
+}
+
+.form-inline .form-control {
+  display: block;
+  width: 100%;
+}
+
+.search {
+    top: 0;
+    position: fixed;
+    right: 5%;
+    z-index: 1000;
+}
+
+.output {
+  background-color: #F5F5F5;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  color: #333333;
+  display: block;
+  font-size: 13px;
+  line-height: 1.42857;
+  margin: 0 0 10px;
+  padding: 9.5px;
+}
+
+.search-focus {
+  background: #FFC145; /* #efefef; */
+}
+
+.td {
+    padding: 3px;
+}
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {
+  padding: 3px;
+
+}
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  line-height: .6;
+}
+.glyphicon {
+   line-height: .5;
+ }
+ .form-control {
+  height: 30px;
+}
+.panel-title {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 14px;
+  color: inherit;
+}
+.du.spinner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: #FFF;
+  opacity: 1 !important;
+}
+
+.du.spinner .animation {
+    font-size: 32px;
+    left: 50%;
+    margin-left: -16px;
+    margin-top: -16px;
+    position: absolute;
+    top: 50%;
+}

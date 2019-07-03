@@ -1,0 +1,4 @@
+put target\DrivrDiagnostics-%1%.war -transfer=binary *
+cd ../scripts
+call ./deploy_diagnostics %1%
+exit
