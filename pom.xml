@@ -63,7 +63,7 @@
   
   	<properties>
 		<skipTests>true</skipTests>
-		<resteasy.version>2.3.3.Final</resteasy.version>
+		<resteasy.version>3.0.11.Final</resteasy.version>
 		<jersey.version>2.9</jersey.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.release>18.05.00</project.release>
